@@ -134,4 +134,4 @@ Jika Anda ingin berkontribusi, silakan ikuti langkah-langkah berikut:
 
 ## Lisensi
 
-Proyek ini dilisensikan di bawah [Nama Lisensi] - lihat file [LICENSE](LICENSE) untuk rincian lebih lanjut.
+Proyek ini dilisensikan di bawah MIT - lihat file [LICENSE](LICENSE) untuk rincian lebih lanjut.
