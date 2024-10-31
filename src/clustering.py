@@ -1,71 +1,96 @@
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-from sklearn.metrics import silhouette_score
+import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, f1_score
+from sklearn.compose import ColumnTransformer
 
-# Membaca dataset
-file_path = '../data/combined_financial_data_idx.csv' 
-data = pd.read_csv(file_path)
+# Langkah 1: Memuat Dataset
+data = pd.read_csv('../data/Impact_of_Remote_Work_on_Mental_Health.csv')
 
-# Tampilkan kolom dalam dataset
+# Memastikan dataset memiliki minimal 2500 baris
+if data.shape[0] < 2500:
+    raise ValueError("Dataset harus memiliki minimal 2500 baris.")
+
+# Menampilkan kolom dalam dataset
 print("Kolom dalam dataset:")
 print(data.columns)
 
-# Memilih kolom kategorikal dan numerikal
-categorical_column = 'type' 
-numerical_columns = ['2020', '2021', '2022', '2023']  
+# Langkah 2: Memilih Fitur
+# Memilih minimal 5 fitur, dengan 1 kolom kategorikal dan 1 kolom numerikal
+features = ['Age', 'Stress_Level', 'Hours_Worked_Per_Week', 
+            'Work_Life_Balance_Rating', 'Social_Isolation_Rating', 
+            'Job_Role']
 
-# Memastikan kolom yang dipilih ada dalam dataset
-if categorical_column not in data.columns or not all(col in data.columns for col in numerical_columns):
-    raise KeyError(f"Kolom '{categorical_column}' atau salah satu kolom numerik tidak ditemukan dalam dataset.")
+# Mengatasi Missing Values
+data['Stress_Level'] = data['Stress_Level'].fillna(data['Stress_Level'].mode()[0])  # Mengisi dengan modus
+data['Job_Role'] = data['Job_Role'].fillna(data['Job_Role'].mode()[0])  # Mengisi dengan modus
 
-# Menyiapkan data untuk clustering
-X = data[[categorical_column] + numerical_columns].copy()
+# Langkah 3: Memisahkan Fitur
+X = data[features]
 
-# Mengubah kolom kategorikal menjadi numerik
-X[categorical_column] = X[categorical_column].astype('category').cat.codes
+# Langkah 4: One-Hot Encoding untuk Kolom Kategorikal dan Normalisasi Data
+numeric_features = ['Age', 'Hours_Worked_Per_Week', 'Social_Isolation_Rating']
+categorical_features = ['Stress_Level', 'Work_Life_Balance_Rating', 'Job_Role']
 
-# Mengisi nilai NaN dengan rata-rata kolom
-X[numerical_columns] = X[numerical_columns].fillna(X[numerical_columns].mean())
+# Membuat transformasi kolom
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), numeric_features),
+        ('cat', OneHotEncoder(), categorical_features)
+    ])
 
-# Standarisasi data
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+# Langkah 5: Clustering dengan KMeans
+X_transformed = preprocessor.fit_transform(X)
 
-# Memulai proses clustering
-print("Memulai proses clustering...")
-kmeans = KMeans(n_clusters=3, random_state=42)  
-labels = kmeans.fit_predict(X_scaled)
+silhouette_scores = []
+for n_clusters in range(2, 11):
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    kmeans.fit(X_transformed)
+    score = silhouette_score(X_transformed, kmeans.labels_)
+    silhouette_scores.append(score)
 
-# Menghitung Silhouette Score
-silhouette_avg = silhouette_score(X_scaled, labels)
+best_n_clusters = silhouette_scores.index(max(silhouette_scores)) + 2
+print(f'Best number of clusters: {best_n_clusters}')
 
-# Mengurangi dimensi untuk visualisasi
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X_scaled)
-
-# Menambahkan label cluster ke DataFrame
-data['Cluster'] = labels
-
-# Tampilkan data dengan label cluster
-print("Data dengan Label Cluster:")
-print(data.head())
-
-# Visualisasi hasil clustering
-plt.figure(figsize=(10, 6))
-plt.scatter(X_pca[:, 0], X_pca[:, 1], c=labels, cmap='viridis', marker='o', edgecolor='k', s=50)
-plt.title('Hasil Clustering dengan KMeans')
-plt.xlabel('Komponen PCA 1')
-plt.ylabel('Komponen PCA 2')
-plt.colorbar(label='Label Cluster')
+# Visualisasi Silhouette Score
+plt.plot(range(2, 11), silhouette_scores)
+plt.xlabel('Number of Clusters')
+plt.ylabel('Silhouette Score')
+plt.title('Silhouette Score for Various Number of Clusters')
+plt.grid()
 plt.show()
 
-# Menyimpan hasil ke CSV    
-output_file = '../data/clustered_data.csv'  
-data.to_csv(output_file, index=False)
+# Menggunakan jumlah cluster terbaik untuk clustering
+kmeans = KMeans(n_clusters=best_n_clusters, random_state=42)
+data['Cluster'] = kmeans.fit_predict(X_transformed)
 
-# Menampilkan Silhouette Score di akhir
-print(f"Silhouette Score: {silhouette_avg:.4f}")
-print(f"Hasil telah disimpan ke {output_file}.")
+# Langkah 6: Analisis Hasil Cluster
+for cluster in range(best_n_clusters):
+    cluster_data = data[data['Cluster'] == cluster]
+    print(f"\nAnalisis untuk Cluster {cluster}:")
+    print(cluster_data.describe())
+
+# Langkah 7: Klasifikasi
+X_train, X_test, y_train, y_test = train_test_split(X_transformed, data['Cluster'], test_size=0.2, random_state=42)
+
+# Random Forest Classifier
+rf = RandomForestClassifier(random_state=42)
+rf.fit(X_train, y_train)
+rf_predictions = rf.predict(X_test)
+
+# Decision Tree Classifier
+dt = DecisionTreeClassifier(random_state=42)
+dt.fit(X_train, y_train)
+dt_predictions = dt.predict(X_test)
+
+# Evaluasi Klasifikasi
+print('Random Forest Accuracy:', accuracy_score(y_test, rf_predictions))
+print('Random Forest F1 Score:', f1_score(y_test, rf_predictions, average='weighted'))
+print('Decision Tree Accuracy:', accuracy_score(y_test, dt_predictions))
+print('Decision Tree F1 Score:', f1_score(y_test, dt_predictions, average='weighted'))
