@@ -1,7 +1,3 @@
-Tentu! Berikut adalah versi lengkap dari README dengan pembaruan pada bagian pendahuluan untuk mencerminkan dataset baru:
-
----
-
 # Remote Work & Mental Health 🌍🧠
 ## Submission: Membangun Proyek Machine Learning
 
@@ -140,7 +136,3 @@ Jika Anda ingin berkontribusi, silakan ikuti langkah-langkah berikut:
 ## Lisensi
 
 Proyek ini dilisensikan di bawah MIT - lihat file [LICENSE](LICENSE) untuk rincian lebih lanjut.
-
----
-
-Jika ada yang ingin ditambahkan atau diubah lagi, silakan beri tahu!
