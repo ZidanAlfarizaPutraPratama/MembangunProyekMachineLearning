@@ -51,7 +51,7 @@ Langkah-langkah untuk menginstal dependensi yang diperlukan:
 
 1. Kloning repository ini:
    ```bash
-   git clone <URL_REPOSITORY>
+   git clone https://github.com/ZidanAlfarizaPutraPratama/MembangunProyekMachineLearning.git
    ```
 2. Masuk ke direktori proyek:
    ```bash
@@ -134,4 +134,4 @@ Jika Anda ingin berkontribusi, silakan ikuti langkah-langkah berikut:
 
 ## Lisensi
 
-Proyek ini dilisensikan di bawah [Nama Lisensi] - lihat file [LICENSE](LICENSE) untuk rincian lebih lanjut.
+Proyek ini dilisensikan di bawah MIT - lihat file [LICENSE](LICENSE) untuk rincian lebih lanjut.
