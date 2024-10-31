@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Memuat dataset hasil clustering
-data = pd.read_csv('../notebooks/clustered_data.csv') 
+data = pd.read_csv('../data/clustered_data.csv') 
 
 # Memeriksa kolom yang tersedia
 print("Kolom dalam dataset:", data.columns)
@@ -13,37 +13,49 @@ sns.set(style='whitegrid')
 
 # Memastikan kolom 'Cluster' ada sebelum melanjutkan
 if 'Cluster' not in data.columns:
-    print("Kolom 'Cluster' tidak ditemukan dalam dataset. Pastikan proses clustering telah dilakukan dan kolom ini disimpan.")
+    print("Kolom 'Cluster' tidak ditemukan dalam dataset.")
 else:
-    # Visualisasi distribusi umur
+    # Visualisasi distribusi data untuk tahun 2020
     plt.figure(figsize=(10, 6))
-    sns.histplot(data['Age'], bins=20, kde=True)
-    plt.title('Distribusi Umur Pelanggan')
-    plt.xlabel('Usia')
+    sns.histplot(data=data, x='2020', bins=20, kde=True, hue='Cluster', multiple='stack', legend=True)
+    plt.title('Distribusi Data Tahun 2020 Berdasarkan Cluster')
+    plt.xlabel('Data 2020')
     plt.ylabel('Frekuensi')
+    plt.legend(title='Cluster', bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.show()
 
-    # Visualisasi pendapatan tahunan
+    # Visualisasi distribusi data untuk tahun 2021
     plt.figure(figsize=(10, 6))
-    sns.histplot(data['Annual Income ($)'], bins=20, kde=True)
-    plt.title('Distribusi Pendapatan Tahunan Pelanggan')
-    plt.xlabel('Pendapatan Tahunan ($)')
+    sns.histplot(data=data, x='2021', bins=20, kde=True, hue='Cluster', multiple='stack', legend=True)
+    plt.title('Distribusi Data Tahun 2021 Berdasarkan Cluster')
+    plt.xlabel('Data 2021')
     plt.ylabel('Frekuensi')
+    plt.legend(title='Cluster', bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.show()
 
-    # Visualisasi skor pengeluaran
+    # Visualisasi distribusi data untuk tahun 2022
     plt.figure(figsize=(10, 6))
-    sns.histplot(data['Spending Score (1-100)'], bins=20, kde=True)
-    plt.title('Distribusi Skor Pengeluaran Pelanggan')
-    plt.xlabel('Skor Pengeluaran (1-100)')
+    sns.histplot(data=data, x='2022', bins=20, kde=True, hue='Cluster', multiple='stack', legend=True)
+    plt.title('Distribusi Data Tahun 2022 Berdasarkan Cluster')
+    plt.xlabel('Data 2022')
     plt.ylabel('Frekuensi')
+    plt.legend(title='Cluster', bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.show()
 
-    # Visualisasi clustering
+    # Visualisasi distribusi data untuk tahun 2023
+    plt.figure(figsize=(10, 6))
+    sns.histplot(data=data, x='2023', bins=20, kde=True, hue='Cluster', multiple='stack', legend=True)
+    plt.title('Distribusi Data Tahun 2023 Berdasarkan Cluster')
+    plt.xlabel('Data 2023')
+    plt.ylabel('Frekuensi')
+    plt.legend(title='Cluster', bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.show()
+
+    # Visualisasi clustering dalam scatter plot
     plt.figure(figsize=(12, 8))
-    sns.scatterplot(x='Annual Income ($)', y='Spending Score (1-100)', hue='Cluster', data=data, palette='Set2', s=100)
-    plt.title('Segmentasi Pelanggan Berdasarkan Pendapatan dan Skor Pengeluaran')
-    plt.xlabel('Pendapatan Tahunan ($)')
-    plt.ylabel('Skor Pengeluaran (1-100)')
-    plt.legend(title='Cluster')
+    sns.scatterplot(x='2020', y='2021', hue='Cluster', data=data, palette='Set2', s=100)
+    plt.title('Segmentasi Berdasarkan Data Tahun 2020 dan 2021')
+    plt.xlabel('Data 2020')
+    plt.ylabel('Data 2021')
+    plt.legend(title='Cluster', bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.show()

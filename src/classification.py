@@ -1,65 +1,45 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, f1_score, classification_report
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score, f1_score
+from sklearn.preprocessing import StandardScaler
 
-# Memuat dataset
-data = pd.read_csv('../data/customers.csv')
+# Membaca dataset yang sudah dilabeli
+file_path = '../data/clustered_data.csv'
+data = pd.read_csv(file_path)
 
-# Tampilkan kolom yang ada
-print(data.columns)
+# Mendefinisikan kolom numerik
+numerical_columns = ['2020', '2021', '2022', '2023']
 
-# Fitur dan label
-X = data[['Age', 'Annual Income ($)', 'Spending Score (1-100)', 'Gender']]
-y = data['Gender']
+# Memilih fitur dan label
+features = data[numerical_columns]  # Hanya kolom numerik untuk fitur
+labels = data['Cluster']  # Label dari hasil clustering
 
-# One-hot encoding untuk variabel kategorikal
-X = pd.get_dummies(X, drop_first=True)
+# Memisahkan dataset menjadi training dan testing set
+X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=42)
 
-# Bagi data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Standarisasi data
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-# Model Random Forest
-model = RandomForestClassifier(random_state=42)
+# Menggunakan Random Forest untuk klasifikasi
+classifier = RandomForestClassifier(random_state=42)
+classifier.fit(X_train_scaled, y_train)
 
-# Hyperparameter tuning
-param_grid = {
-    'n_estimators': [50, 100],
-    'max_depth': [5, 10, None],
-    'min_samples_split': [2, 5]
-}
+# Memprediksi label pada set testing
+y_pred = classifier.predict(X_test_scaled)
 
-grid_search = GridSearchCV(estimator=model, param_grid=param_grid, scoring='f1_weighted', cv=5)
-grid_search.fit(X_train, y_train)
+# Menghitung akurasi dan F1-Score
+accuracy = accuracy_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred, average='weighted')
 
-# Dapatkan model terbaik
-best_model = grid_search.best_estimator_
+# Menampilkan hasil
+print(f"Akurasi: {accuracy:.4f}")
+print(f"F1-Score: {f1:.4f}")
 
-# Prediksi
-y_pred_train = best_model.predict(X_train)
-y_pred_test = best_model.predict(X_test)
-
-# Hitung akurasi dan F1-Score
-train_accuracy = accuracy_score(y_train, y_pred_train)
-train_f1 = f1_score(y_train, y_pred_train, average='weighted')
-test_accuracy = accuracy_score(y_test, y_pred_test)
-test_f1 = f1_score(y_test, y_pred_test, average='weighted')
-
-# hasil
-print(f'Train Accuracy: {train_accuracy}')
-print(f'Train F1-Score: {train_f1}')
-print(f'Test Accuracy: {test_accuracy}')
-print(f'Test F1-Score: {test_f1}')
-
-# laporan klasifikasi
-print("\nLaporan Klasifikasi (Test Set):")
-print(classification_report(y_test, y_pred_test))
-
-# Console
-if train_accuracy >= 0.87 and train_f1 >= 0.87 and test_accuracy >= 0.87 and test_f1 >= 0.87:
-    print("Kriteria 6 terpenuhi dengan sempurna.")
+# Memastikan nilai akurasi dan F1-Score memenuhi syarat
+if accuracy >= 0.87 and f1 >= 0.87:
+    print("Akurasi dan F1-Score memenuhi syarat!")
 else:
-    print("Kriteria 6 belum terpenuhi.")
+    print("Akurasi atau F1-Score belum memenuhi syarat.")

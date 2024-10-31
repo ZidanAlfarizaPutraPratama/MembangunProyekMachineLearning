@@ -1,69 +1,71 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
 from sklearn.decomposition import PCA
+from sklearn.metrics import silhouette_score
+import matplotlib.pyplot as plt
 
-# Load your dataset
-data = pd.read_csv('../data/customers.csv')  # Update path to your dataset
+# Membaca dataset
+file_path = '../data/combined_financial_data_idx.csv' 
+data = pd.read_csv(file_path)
 
-# Memilih fitur yang sesuai
-categorical_columns = ['Gender']
-numerical_columns = ['Annual Income ($)']
+# Tampilkan kolom dalam dataset
+print("Kolom dalam dataset:")
+print(data.columns)
 
-# Memilih fitur
-X = data[categorical_columns + numerical_columns]
+# Memilih kolom kategorikal dan numerikal
+categorical_column = 'type' 
+numerical_columns = ['2020', '2021', '2022', '2023']  
 
-# Menangani nilai yang hilang
-X = X.dropna()  # Menghapus baris dengan nilai yang hilang
+# Memastikan kolom yang dipilih ada dalam dataset
+if categorical_column not in data.columns or not all(col in data.columns for col in numerical_columns):
+    raise KeyError(f"Kolom '{categorical_column}' atau salah satu kolom numerik tidak ditemukan dalam dataset.")
 
-# OneHotEncoding untuk fitur kategorikal
-encoder = OneHotEncoder(sparse_output=False)
-X_encoded = encoder.fit_transform(X[categorical_columns])
+# Menyiapkan data untuk clustering
+X = data[[categorical_column] + numerical_columns].copy()
 
-# Menggabungkan fitur yang telah di-encode dengan fitur numerik
-X_numerical = X[numerical_columns].values
-X_combined = np.hstack((X_encoded, X_numerical))
+# Mengubah kolom kategorikal menjadi numerik
+X[categorical_column] = X[categorical_column].astype('category').cat.codes
 
-# Standardisasi fitur
+# Mengisi nilai NaN dengan rata-rata kolom
+X[numerical_columns] = X[numerical_columns].fillna(X[numerical_columns].mean())
+
+# Standarisasi data
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X_combined)
+X_scaled = scaler.fit_transform(X)
 
-# PCA untuk reduksi dimensi (jika diperlukan)
-pca = PCA(n_components=0.95)
+# Memulai proses clustering
+print("Memulai proses clustering...")
+kmeans = KMeans(n_clusters=3, random_state=42)  
+labels = kmeans.fit_predict(X_scaled)
+
+# Menghitung Silhouette Score
+silhouette_avg = silhouette_score(X_scaled, labels)
+
+# Mengurangi dimensi untuk visualisasi
+pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X_scaled)
 
-# KMeans Clustering dan evaluasi silhouette score
-best_score = -1
-best_n_clusters = 0
+# Menambahkan label cluster ke DataFrame
+data['Cluster'] = labels
 
-for n_clusters in range(2, 15):
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    labels = kmeans.fit_predict(X_pca)
-    silhouette_avg = silhouette_score(X_pca, labels)
-    
-    print(f'KMeans dengan {n_clusters} cluster -> Skor silhouette: {silhouette_avg:.4f}')
-    
-    # Memilih model dengan silhouette score terbaik
-    if silhouette_avg > best_score:
-        best_score = silhouette_avg
-        best_n_clusters = n_clusters
-
-# Menampilkan hasil terbaik
-print(f'Skor silhouette terbaik: {best_score:.4f} dengan {best_n_clusters} cluster.')
-
-if best_score >= 0.55:
-    print(f'Kualitas clustering memenuhi kriteria dengan silhouette score >= 0.55.')
-else:
-    print('Kualitas clustering tidak memenuhi kriteria.')
+# Tampilkan data dengan label cluster
+print("Data dengan Label Cluster:")
+print(data.head())
 
 # Visualisasi hasil clustering
 plt.figure(figsize=(10, 6))
-plt.scatter(X_pca[:, 0], X_pca[:, 1], c=labels, alpha=0.5, cmap='viridis')
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=labels, cmap='viridis', marker='o', edgecolor='k', s=50)
 plt.title('Hasil Clustering dengan KMeans')
-plt.xlabel('Dimensi 1')
-plt.ylabel('Dimensi 2')
-plt.grid()
+plt.xlabel('Komponen PCA 1')
+plt.ylabel('Komponen PCA 2')
+plt.colorbar(label='Label Cluster')
 plt.show()
+
+# Menyimpan hasil ke CSV    
+output_file = '../data/clustered_data.csv'  
+data.to_csv(output_file, index=False)
+
+# Menampilkan Silhouette Score di akhir
+print(f"Silhouette Score: {silhouette_avg:.4f}")
+print(f"Hasil telah disimpan ke {output_file}.")
