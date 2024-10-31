@@ -1,6 +1,11 @@
-# Proyek Analisis Data Pelanggan untuk Membangun Proyek Machine Learning
+Tentu! Berikut adalah versi lengkap dari README dengan pembaruan pada bagian pendahuluan untuk mencerminkan dataset baru:
 
-Proyek ini bertujuan untuk menganalisis data pelanggan dan mengklasifikasikan mereka menggunakan algoritma Random Forest dan metode clustering.
+---
+
+# Remote Work & Mental Health 🌍🧠
+## Submission: Membangun Proyek Machine Learning
+
+Proyek ini bertujuan untuk menganalisis data karyawan dan mengklasifikasikan mereka menggunakan algoritma Random Forest dan metode clustering.
 
 ## Daftar Isi
 - [Pendahuluan](#pendahuluan)
@@ -14,7 +19,7 @@ Proyek ini bertujuan untuk menganalisis data pelanggan dan mengklasifikasikan me
 
 ## Pendahuluan
 
-Proyek ini menggunakan data pelanggan untuk memahami perilaku konsumen dan melakukan segmentasi. Dengan menggunakan algoritma klasifikasi dan clustering, kita dapat mengidentifikasi jenis kelamin pelanggan berdasarkan fitur lain seperti usia, pendapatan tahunan, dan skor pengeluaran.
+Proyek ini menggunakan data karyawan untuk menganalisis pengaruh kerja jarak jauh terhadap kesehatan mental dan kesejahteraan. Dengan memanfaatkan algoritma klasifikasi dan clustering, kita dapat mengidentifikasi pola yang ada dalam data seperti usia, jenis kelamin, peran pekerjaan, lokasi kerja, dan tingkat stres. Data ini mencakup informasi tentang pengalaman kerja, jumlah pertemuan virtual, dan akses ke sumber daya kesehatan mental. Dengan analisis ini, kita bertujuan untuk memahami bagaimana kerja jarak jauh memengaruhi produktivitas, isolasi sosial, dan kepuasan karyawan.
 
 ## Struktur Proyek
 
@@ -23,14 +28,11 @@ Berikut adalah struktur direktori dari proyek ini:
 ```
 .
 ├── data
-│   └── Customers.csv
+│   └── Impact_of_Remote_Work_on_Mental_Health.csv
+├── hasil_clustering.csv
 ├── notebooks
 │   ├── [Clustering]_Submission_Akhir_BMLP_Zidannnapp.ipynb
 │   ├── [Klasifikasi]_Submission_Akhir_BMLP_ZIdannnapp.ipynb
-│   ├── clustered_data.csv
-│   └── customers_with_clusters.csv
-├── results
-│   └── clustering_results.csv
 ├── src
 │   ├── classification.py
 │   └── clustering.py
@@ -40,9 +42,9 @@ Berikut adalah struktur direktori dari proyek ini:
 
 ## Fitur
 
-- Analisis data pelanggan berdasarkan usia, pendapatan tahunan, dan skor pengeluaran.
-- Penggunaan algoritma klasifikasi seperti Random Forest untuk mengklasifikasikan jenis kelamin pelanggan.
-- Metode clustering untuk mengelompokkan pelanggan.
+- Analisis data karyawan berdasarkan usia, jenis kelamin, peran pekerjaan, dan lokasi kerja.
+- Penggunaan algoritma klasifikasi seperti Random Forest untuk mengklasifikasikan kondisi kesehatan mental.
+- Metode clustering untuk mengelompokkan karyawan berdasarkan pola perilaku kerja dan kesejahteraan.
 - Visualisasi hasil analisis dan clustering.
 
 ## Instalasi
@@ -55,7 +57,7 @@ Langkah-langkah untuk menginstal dependensi yang diperlukan:
    ```
 2. Masuk ke direktori proyek:
    ```bash
-   cd project-folder
+   cd MembangunProyekMachineLearning
    ```
 3. Instal dependensi:
    ```bash
@@ -108,10 +110,13 @@ Jika Anda ingin menjalankan analisis menggunakan skrip Python, Anda bisa menjala
 
 ## Evaluasi Model
 
-Hasil evaluasi model yang digunakan dalam proyek ini:
+### Random Forest
+- **Akurasi Pelatihan**: 100%  
+- **F1-Score Pelatihan**: 100%  
+- **Akurasi Pengujian**: 96%  
+- **F1-Score Pengujian**: 96%  
 
-- **Akurasi**: 92%
-- **F1-Score**: 91%
+Model Random Forest menunjukkan performa yang sangat baik. Selama pelatihan, model mencapai akurasi dan F1-Score 100%, menandakan bahwa model sangat efektif dalam mempelajari data pelatihan. Namun, saat diuji pada data yang tidak terlihat, akurasi dan F1-Score sedikit menurun menjadi 96%, yang tetap menunjukkan kemampuan klasifikasi yang kuat.
 
 ## Kontribusi
 
@@ -135,3 +140,7 @@ Jika Anda ingin berkontribusi, silakan ikuti langkah-langkah berikut:
 ## Lisensi
 
 Proyek ini dilisensikan di bawah MIT - lihat file [LICENSE](LICENSE) untuk rincian lebih lanjut.
+
+---
+
+Jika ada yang ingin ditambahkan atau diubah lagi, silakan beri tahu!
